@@ -2,9 +2,6 @@ import csv
 import sys
 
 
-file_path = 'testdata/complex.csv'
-
-
 # method to convert a string into float, if possible.
 # if unable, returns 'a'.
 
@@ -59,16 +56,74 @@ def get_file_names(arguments):
 
 # a class that takes care of the actual deconvolution.
 
-
 class Deconvolutor():
-    def __init__(self, complex, pure1, pure2):
+    def __init__(self, mix, pure1, pure2):
         
-        self.complex = complex
+        self.mix = mix
         self.pure1 = pure1
         self.pure2 = pure2
+        self.residues = sum(mix[1])
+        self.frac1 = 0
+        self.frac2 = 0
+
+        if len(self.mix[1]) == len(self.pure1[1]) & len(self.pure1[1]) == len(self.pure2[1]):
+            pass
+        else:    
+            print('The files provided contain differing amounts of data, please check that the data sets are of equal lengths')
+            sys.exit()
+        
+    
+    # returns the fractions of the pure species
+
+    def deconvolute(self):
+        
+        i = 0
+
+        mix_spectrum = self.mix[1]
+        pure1_spectrum = self.pure1[1]
+        pure2_spectrum = self.pure2[1]
+        
+
+        while i <= 100:
+            
+            j = 0
+            calculated_spectrum = list()
+
+            while j < len(mix_spectrum):
+                calculated_spectrum.append(pure1_spectrum[j]*i*0.01 + pure2_spectrum[j]*(1 - i*0.01))
+                j += 1
+            
+            k = 0
+            fit_residues = 0
+
+            while k < len(mix_spectrum):
+                difference = abs(mix_spectrum[k] - calculated_spectrum[k])
+                
+                fit_residues += difference
+                k += 1
+
+            if (fit_residues < self.residues):
+                self.frac1 = i*0.01
+                self.frac2 = 1 - i*0.01
+                self.residues = fit_residues
+
+            
+
+            i += 1
+        
+        return [self.frac1, self.frac2]
+
+
 
 
 
 if __name__ == '__main__':
-    pass
+    mix = data_loader(get_file_names(sys.argv)[0])
+    pure1 = data_loader(get_file_names(sys.argv)[1])
+    pure2 = data_loader(get_file_names(sys.argv)[2])
+        
+    d = Deconvolutor(mix, pure1, pure2)
+    print('')
+    print('Fraction of pure species 1:', d.deconvolute()[0])
+    print('Fraction of pure species 2:', d.deconvolute()[1]) 
 
