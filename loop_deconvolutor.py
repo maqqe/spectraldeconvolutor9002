@@ -61,11 +61,11 @@ def get_file_names(arguments):
 
 
 class Deconvolutor():
-    def __init__(self):
+    def __init__(self, complex, pure1, pure2):
         
-        self.mix = data_loader(get_file_names(sys.argv)[0])
-        self.pure1 = data_loader(get_file_names(sys.argv)[1])
-        self.pure2 = data_loader(get_file_names(sys.argv)[2])
+        self.complex = complex
+        self.pure1 = pure1
+        self.pure2 = pure2
 
 
 
