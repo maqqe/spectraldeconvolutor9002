@@ -83,7 +83,6 @@ class Deconvolutor():
         pure1_spectrum = self.pure1[1]
         pure2_spectrum = self.pure2[1]
         
-
         while i <= 100:
             
             j = 0
@@ -106,8 +105,6 @@ class Deconvolutor():
                 self.frac1 = i*0.01
                 self.frac2 = 1 - i*0.01
                 self.residues = fit_residues
-
-            
 
             i += 1
         
