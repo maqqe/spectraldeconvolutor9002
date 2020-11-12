@@ -1,6 +1,6 @@
 import csv
 import sys
-
+import time
 
 # method to convert a string into float, if possible.
 # if unable, returns 'a'.
@@ -33,6 +33,7 @@ def data_loader(file_path):
         return (col1, col2)
         
     except:
+        print('')
         print('One or more file names provided could not be found, please check input')
         sys.exit()
 
@@ -50,6 +51,7 @@ def get_file_names(arguments):
             i += 1
         return file_names
     else:
+        print('')
         print('Too many or too few command line arguments, please make sure 3 file names are provided')
         sys.exit()
 
@@ -68,7 +70,8 @@ class Deconvolutor():
 
         if len(self.mix[1]) == len(self.pure1[1]) & len(self.pure1[1]) == len(self.pure2[1]):
             pass
-        else:    
+        else:
+            print("")    
             print('The files provided contain differing amounts of data, please check that the data sets are of equal lengths')
             sys.exit()
         
@@ -111,16 +114,24 @@ class Deconvolutor():
         return [self.frac1, self.frac2]
 
 
-
-
-
 if __name__ == '__main__':
+    
+
     mix = data_loader(get_file_names(sys.argv)[0])
     pure1 = data_loader(get_file_names(sys.argv)[1])
     pure2 = data_loader(get_file_names(sys.argv)[2])
         
     d = Deconvolutor(mix, pure1, pure2)
+
+    t1 = time.time()
+
     print('')
     print('Fraction of pure species 1:', d.deconvolute()[0])
     print('Fraction of pure species 2:', d.deconvolute()[1]) 
+    print('Fit residues:', d.residues)
+
+    t2 = time.time()
+
+    print('Took', t2 - t1, 'seconds to deconvolute')
+   
 
