@@ -33,8 +33,7 @@ def data_loader(file_path):
         return (col1, col2)
         
     except:
-        print('')
-        print('One or more file names provided could not be found, please check input')
+        print('\nOne or more file names provided could not be found, please check input')
         sys.exit()
 
 
@@ -51,8 +50,7 @@ def get_file_names(arguments):
             i += 1
         return file_names
     else:
-        print('')
-        print('Too many or too few command line arguments, please make sure 3 file names are provided')
+        print('\nToo many or too few command line arguments, please make sure 3 file names are provided')
         sys.exit()
 
 
@@ -70,9 +68,8 @@ class Deconvolutor():
 
         if len(self.mix[1]) == len(self.pure1[1]) & len(self.pure1[1]) == len(self.pure2[1]):
             pass
-        else:
-            print("")    
-            print('The files provided contain differing amounts of data, please check that the data sets are of equal lengths')
+        else:   
+            print('\nThe files provided contain differing amounts of data, please check that the data sets are of equal lengths')
             sys.exit()
         
     
@@ -125,10 +122,9 @@ if __name__ == '__main__':
 
     t1 = time.time()
 
-    print('')
-    print('Fraction of pure species 1:', d.deconvolute()[0])
-    print('Fraction of pure species 2:', d.deconvolute()[1]) 
-    print('Fit residues:', d.residues)
+    print('\nFraction of pure species 1:', round(d.deconvolute()[0], 2))
+    print('Fraction of pure species 2:', round(d.deconvolute()[1], 2))
+    print('Sum of fit residues:', d.residues)
 
     t2 = time.time()
 
