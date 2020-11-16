@@ -113,7 +113,6 @@ class Deconvolutor():
 
 if __name__ == '__main__':
     
-
     mix = data_loader(get_file_names(sys.argv)[0])
     pure1 = data_loader(get_file_names(sys.argv)[1])
     pure2 = data_loader(get_file_names(sys.argv)[2])
