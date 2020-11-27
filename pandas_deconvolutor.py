@@ -4,40 +4,6 @@ import matplotlib.pyplot as plt
 import time
 import sys
 
-"""
-df2 = pd.DataFrame({'A': 1.,
-                    'B': pd.Timestamp('20130102'),
-                    'C': pd.Series(1, index=list(range(3)), dtype='float32'),
-                    'D': np.array([3] * 3, dtype='int32'),
-                    'E': pd.Categorical(["test", "train", "test"]),
-                    'F': 'foo'})
-
-print(df2.iloc[0:2])
-
-
-
-df3 = pd.DataFrame({'wl': [1,2,3,4,5,'shimadzu 5000'], 'counts': [5,6,7,8,9,'shima 5000']})
-
-df4 = pd.DataFrame({'wl': [1,2,3,4,5], 'counts': [5,6,7,8,9]})
-
-print(df3.iloc[:, 1])
-
-df3 = df3.set_index('wl')
-df4 = df4.set_index('wl')
-
-
-df5 = df3 + df4
-print(df5.dropna(how='any'))
-
-
-print(df3.describe())
-print(pd.isna(df4))
-
-dates = pd.date_range('20130101', periods=6)
-df = pd.DataFrame(np.random.randn(6, 4), index=dates, columns=list('ABCD')) """
-
-
-
 class Deconvolutor():
 
 
@@ -76,98 +42,114 @@ class Deconvolutor():
             sys.exit()
 
 
-    # Deconvolutes the provided spectra
+    # Deconvolutes the provided complex spectrum using the provided spectra of pure species.
 
     def deconvolute(self):
 
-        f1 = 0
-        f2 = 0
-        f3 = 0
         self.load_data()
+        fractions = [0., 0.]
+        if len(self.dsets) == 4:
+            fractions.append(0.)
         residues = self.dsets[0].sum()[1]
-        i = 0
+        residue_spectrum = self.dsets[0]
 
-        t1 = time.time()
+        i = 0
 
         while i <= 100:
 
             if len(self.dsets) == 3:
-                calc_spectrum = pd.Series(self.dsets[1].iloc[:, 1]*i*0.01 + self.dsets[2].iloc[:, 1]*(1-i*0.01))
+
+                calc_spectrum = pd.Series(self.dsets[1].iloc[:, 1]*i*0.01 
+                                + self.dsets[2].iloc[:, 1]*(1-i*0.01))
                 calc_residues = abs(self.dsets[0].iloc[:, 1] - calc_spectrum).sum()
 
                 if calc_residues < residues:
+                    
+                    residue_spectrum['Residues'] = self.dsets[0].iloc[:, 1] - calc_spectrum
                     residues = calc_residues
-                    f1 = i*0.01
-                    f2 = 1-i*0.01
-            
+                    fractions[0] = i*0.01
+                    fractions[1] = 1-i*0.01
+                
             if len(self.dsets) == 4:
 
                 j = 0
 
-                while j <= 100:
-                    calc_spectrum = pd.Series(self.dsets[1].iloc[:, 1]*i*0.01 + self.dsets[2].iloc[:, 1]*j*0.01 + self.dsets[3].iloc[:, 1]*(1-j*0.01))
-                    calc_residues = abs(self.dsets[0].iloc[:, 1] -  calc_spectrum).sum()
+                while j <= 100 - i:
+
+                    calc_spectrum = pd.Series(self.dsets[1].iloc[:, 1]*i*0.01 
+                                    + self.dsets[2].iloc[:, 1]*j*0.01 
+                                    + self.dsets[3].iloc[:, 1]*(1-j*0.01-i*0.01))                  
+                    calc_residues = abs(self.dsets[0].iloc[:, 1] - calc_spectrum).sum()
 
                     if calc_residues < residues:
+                        
+                        residue_spectrum['Residues'] = self.dsets[0].iloc[:, 1] - calc_spectrum
                         residues = calc_residues
-                        f1 = i*0.01
-                        f2 = j*0.01
-                        f3 = 1-j*0.01
-                    
+                        fractions[0] = i*0.01
+                        fractions[1] = j*0.01
+                        fractions[2] = 1-j*0.01-i*0.01
+
                     j += 1
 
+            i += 1
 
+        return [fractions, residue_spectrum]
+
+
+    # Plots the deconvoluted data into a line graph. 
+    # Shown in the graph are the original mix spectrum and the spectra of the pure species multiplied by their respective fraction.
+
+    def plot_data(self, fractions, residues):
+
+        frax = fractions        
+
+        for d in self.dsets:
+            d = d.set_index(d.columns[0])
+
+        df = pd.DataFrame(self.dsets[0])
+
+        df['Residues'] = residues.iloc[:, 2]
+        df['Species 1'] = self.dsets[1].iloc[:, 1] * frax[0]
+        df['Species 2'] = self.dsets[2].iloc[:, 1] * frax[1]
+        if len(frax) == 3:
+            df['Species 3'] = self.dsets[3].iloc[:, 1] * frax[2]
+
+        plot = df.plot(x = df.columns[0])
+
+        plot.figure.savefig('fit.png')
+
+    
+ # Runs the script. Reports the fractions from deconvolute() and saves figures from plot_data().
+
+    def run(self):
+
+        print('\nProcessing input...\n')
+        i = 0
+
+        t1 = time.time()
+
+        frax = self.deconvolute()[0]
+        
+          
+
+        while i < len(frax):
+            print('Fraction of Species', i + 1, ': ', frax[i])
             i += 1
         
         t2 = time.time()
 
-        print(f1, f2)
+        print('\nTook', round(t2 - t1, ndigits = 1), 'seconds to deconvolute')
+        print('\nCreating fit.png in current working directory')
 
-        print(t2 - t1)
-
-
-d = Deconvolutor(['aa', 'testdata/complex.csv', 'testdata/pure1.csv', 'testdata/pure2.csv'])
-d.deconvolute()
-
-
-""" script_dir = os.getcwd()
-datafile = 'testdata/complex.csv'
-
-mix = pd.read_csv(os.path.normcase(os.path.join(script_dir, datafile)))
-
-pure1 = pd.read_csv(os.path.normcase(os.path.join(script_dir, 'testdata/pure1.csv')))
-pure2 = pd.read_csv(os.path.normcase(os.path.join(script_dir, 'testdata/pure2.csv')))
-
-f1 = 0
-f2 = 0
-
-residues = mix.sum()[1]
-
-i = 0
-
-t1 = time.time()
-
-while i <= 100:
-
-    #TRY AND PLAY WITH APPEND HERE
-    # Adding a column to a DataFrame is relatively fast. However, adding a row requires a copy, and may be expensive. 
-    # We recommend passing a pre-built list of records to the DataFrame constructor instead of building a DataFrame by iteratively appending records to it. 
-    # See Appending to dataframe for more.
-
-    calc = pd.Series(pure1['counts']*i*0.01 + pure2['counts']*(1-i*0.01))
-
-    calc_res = abs(mix['counts'] - calc).sum()
+        self.plot_data(frax, self.deconvolute()[1])
         
-    if calc_res < residues:
-        residues = calc_res
-        f1 = i*0.01
-        f2 = 1-i*0.01 
-        
-    i += 1
 
-t2 = time.time()
 
-print(f1)
-print(f2)
-print('Took', t2 - t1, 'seconds to deconvolute') """
+# d = Deconvolutor(['aa', 'testdata/3m.csv', 'testdata/3p1.csv', 'testdata/3p2.csv', 'testdata/3p3.csv'])
+# d = Deconvolutor(['aa', 'testdata/complex.csv', 'testdata/pure1.csv', 'testdata/pure2.csv'])
+# d.run()
 
+
+if __name__ == '__main__':
+    d = Deconvolutor(sys.argv)
+    d.run()
