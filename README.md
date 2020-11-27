@@ -11,7 +11,11 @@ The complex spectrum has to be the first .csv file in the list, followed by two 
 
 The .csv file architecture has to be in the format
 
-> x-axis data,y-axis data, . . .  1,2, . . .  2,5, . . .  3,3, . . .  ...,..., . . .
+> x-axis data,y-axis data, . . .  
+1,2, . . .  
+2,5, . . .  
+3,3, . . .  
+...,..., . . .
 
 All the files need to be of the same length, as in contain an equal amount of data points.
 
