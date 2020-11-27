@@ -9,13 +9,9 @@ The script takes .csv files as input as in
 The complex spectrum has to be the first .csv file in the list, followed by two or three component spectrum files
 
 
-The .csv file architecture has to be in the format
+The .csv file architecture has to be as follows
 
 > x-axis data,y-axis data, . . .  
-1,2, . . .  
-2,5, . . .  
-3,3, . . .  
-...,..., . . .
 
 All the files need to be of the same length, as in contain an equal amount of data points.
 
