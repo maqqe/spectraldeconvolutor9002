@@ -99,9 +99,7 @@ class Deconvolutor():
     # Plots the deconvoluted data into a line graph. 
     # Shown in the graph are the original mix spectrum and the spectra of the pure species multiplied by their respective fraction.
 
-    def plot_data(self, fractions, residues):
-
-        frax = fractions        
+    def plot_data(self, fractions, residues):        
 
         for d in self.dsets:
             d = d.set_index(d.columns[0])
@@ -109,10 +107,10 @@ class Deconvolutor():
         df = pd.DataFrame(self.dsets[0])
 
         df['Residues'] = residues.iloc[:, 2]
-        df['Species 1'] = self.dsets[1].iloc[:, 1] * frax[0]
-        df['Species 2'] = self.dsets[2].iloc[:, 1] * frax[1]
-        if len(frax) == 3:
-            df['Species 3'] = self.dsets[3].iloc[:, 1] * frax[2]
+        df['Species 1'] = self.dsets[1].iloc[:, 1] * fractions[0]
+        df['Species 2'] = self.dsets[2].iloc[:, 1] * fractions[1]
+        if len(fractions) == 3:
+            df['Species 3'] = self.dsets[3].iloc[:, 1] * fractions[2]
 
         plot = df.plot(x = df.columns[0])
 
@@ -130,8 +128,6 @@ class Deconvolutor():
 
         frax = self.deconvolute()[0]
         
-          
-
         while i < len(frax):
             print('Fraction of Species', i + 1, ': ', frax[i])
             i += 1
@@ -142,12 +138,6 @@ class Deconvolutor():
         print('\nCreating fit.png in current working directory')
 
         self.plot_data(frax, self.deconvolute()[1])
-        
-
-
-# d = Deconvolutor(['aa', 'testdata/3m.csv', 'testdata/3p1.csv', 'testdata/3p2.csv', 'testdata/3p3.csv'])
-# d = Deconvolutor(['aa', 'testdata/complex.csv', 'testdata/pure1.csv', 'testdata/pure2.csv'])
-# d.run()
 
 
 if __name__ == '__main__':
