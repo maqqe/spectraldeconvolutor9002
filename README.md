@@ -1,6 +1,6 @@
 # spectraldeconvolutor9002
 
-A small python script that deconvolutes up complex spectrum of up to 3 component spectra.
+A small python script that deconvolutes up complex spectrum of up to 3 component spectra. Requires Numpy, pandas, and matplotlib.
 
 The script takes .csv files as input as in
 
@@ -18,4 +18,4 @@ All the files need to be of the same length, as in contain an equal amount of da
 Upon finishing, the script will print the fractions of the component species in the complex spectra and create a graph that shows the complex spectrun, fraction scaled component spectra and any possible left over residues from the fitting. The graph is saved as 'fit.png' in the folder the script was run in.
 
 
-A deconvolutor based on basic python functionalities is also included as loop_deconvolutor.py. This script takes only a maximum of 2 component spectra and does not graph the results. It is not, however, reliant on having numpy, pandas, or matplotlib installed.
+A deconvolutor based on basic python functionalities is also included as loop_deconvolutor.py. This script takes only a maximum of 2 component spectra and does not graph the results. It is not, however, reliant on having numpy, pandas, and matplotlib installed.
